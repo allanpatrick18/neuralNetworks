@@ -100,6 +100,47 @@ def test_validacao():
     plt.legend()
     plt.show()
 
+def test_validacao1():
+
+    dataset_treinamento =create_dataset(0, 2 * np.pi, 30)
+    dataset_validacao = create_dataset(0.32, 2.1 * np.pi, 10)
+    error = 1.0
+    epoch = 0
+    e_ant=10.0
+    e=0.0
+    p = len(dataset_treinamento)
+    while (error / p > 0.0001 and epoch < 1000):
+        sum_error = [0.0, 0.0, 0.0]
+        error = 0.0
+        lim_error = 0.0
+        err =0.0
+        p = 0
+        epoch += 1
+        for row in dataset_treinamento:
+            error = row[-1] - neuronio(row, weight)
+            lim_error += step * error
+            for i in range(len(weight) - 1):
+                sum_error[i] = sum_error[i] + step * error * row[i + 2]
+            p += 1
+            err+=error
+        for i in range(len(weight) - 1):
+            weight[i] = weight[i] + sum_error[i] / p
+            error += sum_error[i] ** 2
+        weight[-1] = weight[-1] + lim_error / p
+
+        if(e_ant>e or err>e_ant):
+            for row in dataset_validacao:
+                error = row[-1] - neuronio(row, weight)
+                e+=error;
+            e_ant = e
+        else:
+            print("ssai..."+ str(e_ant)+" "+str(e) +" "+str(epoch))
+            break
+
+
+
+
+
 def create_dataset(init,end,qtd):
     z1 = np.linspace(init,end,qtd)
     dataset_test = []
@@ -188,58 +229,60 @@ def create_fun():
     plt.tight_layout()
     plt.show()
 
+if __name__ == '__main__':
 
-dataset=[]
-z = np.linspace(0, 2*np.pi, 15)
-for k in range(len(z)):
-    x_1 = np.sin(z[k])
-    x_2 = np.cos(z[k])
-    x_3 = z[k]
-    f = (-1)*np.pi + 0.565*x_1 + 2.674* x_2 + 0.674*x_3
-    dat=[k+1,round(z[k],3),round(x_1,3),round(x_2,3),round(x_3,3),round(f,3)]
-    print(dat)
-    dataset.append(dat)
+    dataset=[]
+    z = np.linspace(0, 2*np.pi, 15)
+    for k in range(len(z)):
+        x_1 = np.sin(z[k])
+        x_2 = np.cos(z[k])
+        x_3 = z[k]
+        f = (-1)*np.pi + 0.565*x_1 + 2.674* x_2 + 0.674*x_3
+        dat=[k+1,round(z[k],3),round(x_1,3),round(x_2,3),round(x_3,3),round(f,3)]
+        print(dat)
+        dataset.append(dat)
 
-print("Trainning Adalaine Por Padrão:")
-print("Pesos iniciais:")
-weight=[0.2,-0.1,0.1,0.5]
-print(weight)
-print("Pesos Ajustado:")
-step =0.1
-training_weights(dataset)
-weight_padrao = weight[:]
-print(weight_padrao)
+    print("Trainning Adalaine Por Padrão:")
+    print("Pesos iniciais:")
+    weight=[0.2,-0.1,0.1,0.5]
+    print(weight)
+    print("Pesos Ajustado:")
+    step =0.1
+    training_weights(dataset)
+    weight_padrao = weight[:]
+    print(weight_padrao)
 
-print("-------------------------------")
-print("Trainning Adalaine Por Batelada:")
-print("Pesos iniciais:")
-weight=[0.2,-0.1,0.1,0.5]
-print(weight)
-print("Pesos Ajustado:")
-training_weights_bateladas(dataset)
-weight_batelada = weight[:]
-print(weight_batelada)
+    print("-------------------------------")
+    print("Trainning Adalaine Por Batelada:")
+    print("Pesos iniciais:")
+    weight=[0.2,-0.1,0.1,0.5]
+    print(weight)
+    print("Pesos Ajustado:")
+    training_weights_bateladas(dataset)
+    weight_batelada = weight[:]
+    print(weight_batelada)
 
-print("-------------------------------")
-print("3.4 Teste com padrões diferentes dos treinados:")
-print("Pesos iniciais:")
-weight=[0.2,-0.1,0.1,0.5]
-print(weight)
-print("Pesos Ajustado:")
-training_weights_bateladas(dataset)
-weight_batelada = weight[:]
-print(weight_batelada)
-create_fun()
-test_function()
+    print("-------------------------------")
+    print("3.4 Teste com padrões diferentes dos treinados:")
+    print("Pesos iniciais:")
+    weight=[0.2,-0.1,0.1,0.5]
+    print(weight)
+    print("Pesos Ajustado:")
+    training_weights_bateladas(dataset)
+    weight_batelada = weight[:]
+    print(weight_batelada)
+    # create_fun()
+    # test_function()
 
-print("-------------------------------")
-print("3.5 Refaça o treinamento com 50 padrões")
-print("Pesos iniciais:")
-weight=[0.2,-0.1,0.1,0.5]
-print(weight)
-print("Pesos Ajustado:")
-# test_validacao()
-print(weight_batelada)
+    print("-------------------------------")
+    print("3.5 Refaça o treinamento com 50 padrões")
+    print("Pesos iniciais:")
+    weight=[0.2,-0.1,0.1,0.5]
+    print(weight)
+    print("Pesos Ajustado:")
+    # test_validacao()
+    test_validacao1()
+    print(weight_batelada)
 
 
 

@@ -36,14 +36,47 @@ if __name__ == '__main__':
             dataset.append(dat)
         return wished
 
-    dataset_test = np.array(create_dataset(0,2*np.pi,15))
-    wished_result = np.array(create_datasetw(0,2*np.pi,15))
-    adalaine = adalineFinal(input_size=3)
-    adalaine.fit(dataset_test, wished_result)
-    adalaine.batelada(dataset_test, wished_result)
-    adalaine.printTrain(dataset_test, wished_result)
-    adalaine.graph_err()
-    print(adalaine.W)
+
+    while (1):
+        print("=================")
+        print("1-Adaline Pattern")
+        print("2-Adaline Batch")
+        q = int(input())
+
+        if q == 1:
+            print("1-Adaline Pattern")
+            dataset_test = np.array(create_dataset(0, 2 * np.pi, 15))
+            wished_result = np.array(create_datasetw(0, 2 * np.pi, 15))
+            adalaine = adalineFinal(input_size=3)
+            adalaine.pattern(dataset_test, wished_result)
+            adalaine.printTrain(dataset_test, wished_result)
+            adalaine.graph_err("Pattern")
+            print(adalaine.W)
+
+
+        elif q == 2:
+            print("==========")
+            print("2-Adaline Batch")
+            dataset_test = np.array(create_dataset(0, 2 * np.pi, 15))
+            wished_result = np.array(create_datasetw(0, 2 * np.pi, 15))
+            adalaine = adalineFinal(input_size=3)
+            adalaine.batch(dataset_test, wished_result)
+            adalaine.printTrain(dataset_test, wished_result)
+            adalaine.graph_err("Batch")
+            print(adalaine.W)
+
+        elif q == 3:
+            print("3-Porta OR Padrão")
+            print("==========")
+
+        elif q == 4:
+            print("4-Porta OR Batelada")
+            print("==========")
+
+
+        else:
+            nome = None
+            print("Valor invalido")
 
 
 
