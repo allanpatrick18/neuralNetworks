@@ -19,6 +19,8 @@ class perceptron(object):
         a = self.activation_fn(z)
         return a
 
+
+
     def fit(self, X, d):
         for k in range(self.epochs):
             for i in range(d.shape[0]):
