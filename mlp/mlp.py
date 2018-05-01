@@ -2,42 +2,36 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from math import exp
-from random import seed
-from random import random
-# https://machinelearningmastery.com/implement-backpropagation-algorithm-scratch-python/
+from random import random, seed
+
+
 class mlp(object):
 
-    def __init__(self, input_size, lr=0.1, epochs=1000,n_inputs=2, n_hidden=2, n_outputs=1):
-        self.W = np.zeros(input_size+1)
-        self.E = np.zeros(input_size + 1)
-        #add one for bias
-        self.epochs = epochs
-        self.lr = lr
-        self.erros_gragh = []
-        network = list()
+    def __init__(self,n_inputs=2, n_hidden=2, n_outputs=1):
+        self.network = list()
         hidden_layer = [{'weights': np.array([random() for i in range(n_inputs + 1)])} for i in range(n_hidden)]
-        network.append(hidden_layer)
+        self.network.append(hidden_layer)
         output_layer = [{'weights': np.array([random() for i in range(n_hidden + 1)])} for i in range(n_outputs)]
-        network.append(output_layer)
+        self.network.append(output_layer)
+
 
     def sum_weights(self, weight, x):
         return weight.T.dot(x)
 
-    def activate(weights, inputs):
+    def activate(self,weights, inputs):
         return weights.T.dot(inputs)
 
     # Transfer neuron activation
-    def transfer(activation):
+    def transfer(self,activation):
         return 1.0 / (1.0 + np.exp(-activation))
 
     def predict(self, x):
         return self.W.T.dot(x)
 
     # Forward propagate input to a network output
-    def forward_propagate(self,network, row):
+    def forward_propagate(self, row):
         inputs = row
-        for layer in network:
+        for layer in self.network:
             new_inputs = []
             for neuron in layer:
                 x = np.insert(inputs,0, 1)
@@ -72,26 +66,26 @@ class mlp(object):
     def transfer_derivative(self, output):
         return output * (1.0 - output)
 
-    # Update network weights with error
-    def update_weights(sefl,network, row, l_rate):
-        for i in range(len(network)):
-            inputs = row[:-1]
+    # Update self.network weights with error
+    def update_weights(self, row, l_rate):
+        for i in range(len(self.network)):
+            inputs =  row
             if i != 0:
-                inputs = [neuron['output'] for neuron in network[i - 1]]
-            for neuron in network[i]:
+                inputs = [neuron['output'] for neuron in self.network[i - 1]]
+            for neuron in self.network[i]:
                 for j in range(len(inputs)):
                     neuron['weights'][j] += l_rate * neuron['delta'] * inputs[j]
-                neuron['weights'][-1] += l_rate * neuron['delta']
+                neuron['weights'][0] += l_rate * neuron['delta']
 
     # Backpropagate error and store in neurons
-    def backward_propagate_error(self, network, expected):
-        for i in reversed(range(len(network))):
-            layer = network[i]
+    def backward_propagate_error(self, expected):
+        for i in reversed(range(len(self.network))):
+            layer = self.network[i]
             errors = list()
-            if i != len(network) - 1:
+            if i != len(self.network) - 1:
                 for j in range(len(layer)):
                     error = 0.0
-                    for neuron in network[i + 1]:
+                    for neuron in self.network[i + 1]:
                         error += (neuron['weights'][j] * neuron['delta'])
                         errors.append(error)
             else:
@@ -102,17 +96,16 @@ class mlp(object):
                     neuron = layer[j]
                     neuron['delta'] = errors[j] * self.transfer_derivative(neuron['output'])
 
-    # Train a network for a fixed number of epochs
-    def train_network(self,network, train, l_rate, n_epoch, n_outputs):
+    # Train a self.network for a fixed number of epochs
+    def train_network(self, train, expected , l_rate, n_epoch):
         for epoch in range(n_epoch):
             sum_error = 0
-            for row in train:
-                outputs = self.forward_propagate(network, row)
-                expected = np.array([0 for i in range(n_outputs)])
-                sum_error += sum(expected- outputs)
-                self.backward_propagate_error(network, expected)
-                self.update_weights(network, row, l_rate)
-            print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
+            for r, row in enumerate(train):
+                outputs = self.forward_propagate(row)
+                sum_error += sum(- outputs)**2
+                self.backward_propagate_error(float(expected[r]))
+                self.update_weights(row, l_rate)
+           # print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
 
     def printTrain(self,X,d):
         for i in range(d.shape[0]):
@@ -120,7 +113,7 @@ class mlp(object):
             y = self.predict(x)
             print(str(X[i])+" = "+str(y))
 
-    def graph_err(self , title):
+    def graph_err(self,title):
         squart_err =[]
         plt.figure()
         plt.plot(self.erros_gragh)
@@ -132,3 +125,21 @@ class mlp(object):
         plt.grid(True)
         plt.legend()
         plt.show()
+
+# Test training backprop algorithm
+if __name__ == '__main__':
+
+    seed(1)
+    dataset = np.array([
+        [0, 0],
+        [0, 1],
+        [1, 0],
+        [1, 1]
+    ])
+    expected = np.array([0,1,1,0])
+    casa = mlp(2, 2, 1)
+    casa.train_network(dataset,expected, 0.001, 10000000)
+    for row in dataset:
+        print(casa.forward_propagate(row))
+    for layer in casa.network:
+        print(layer)

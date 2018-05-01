@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
-from decimal import Decimal
 
 class adalineFinal(object):
 
